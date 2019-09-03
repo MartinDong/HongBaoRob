@@ -1,11 +1,6 @@
 package com.yu.hongbaorob.fragment;
 
 import android.Manifest;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -17,7 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.Settings;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,16 +25,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import com.yu.hongbaorob.R;
 import com.yu.hongbaorob.RobApplication;
 import com.yu.hongbaorob.service.HongBaoService;
-import com.yu.hongbaorob.utils.PermissionUtils;
+import com.yu.hongbaorob.utils.NotificationUtil;
+import com.yu.hongbaorob.utils.PermissionUtil;
 import com.yu.hongbaorob.widget.MySwitchCompat;
 
 import java.io.File;
@@ -98,7 +91,7 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
 
         btnNotificationListener.setOnClickListener(v -> jumpToNotificationListenerSetting());
 
-        btnOverlays.setOnClickListener(v -> PermissionUtils.manageDrawOverlays(getActivity()));
+        btnOverlays.setOnClickListener(v -> PermissionUtil.manageDrawOverlays(getActivity()));
 
         // 检查权限
         CircularProgressButton btnCheckPermission = view.findViewById(R.id.btn_check_permission);
@@ -109,8 +102,8 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
             llPermission.removeAllViews();
             llPermission.addView((View) btnCheckPermission.getParent());
 
-            boolean accessibilityServiceSettingEnabled = isAccessibilityServiceSettingEnabled();
-            boolean notificationListenerSettingEnabled = isNotificationListenerSettingEnabled();
+            boolean accessibilityServiceSettingEnabled = PermissionUtil.isAccessibilityServiceSettingEnabled(getContext(), HongBaoService.class.getCanonicalName());
+            boolean notificationListenerSettingEnabled = PermissionUtil.isNotificationListenerSettingEnabled(getContext());
 
             handler.postDelayed(() -> {
                 addView(llPermission,
@@ -119,7 +112,7 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
                         isAccessibilityServiceWork(),
                         v1 -> jumpToAccessSetting());
                 if (notificationListenerSettingEnabled)
-                    sendNotification();
+                    NotificationUtil.sendNotification(getActivity(), "检测结果", "通知通道正常");
             }, 500);
 
             handler.postDelayed(() ->
@@ -134,7 +127,7 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
                             "悬浮窗权限",
                             null,
                             checkFloatingPermission(),
-                            v1 -> PermissionUtils.manageDrawOverlays(getActivity())), 1500);
+                            v1 -> PermissionUtil.manageDrawOverlays(getActivity())), 1500);
 
             handler.postDelayed(() ->
                     addView(llPermission,
@@ -175,56 +168,18 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
     }
 
     private boolean checkFloatingPermission() {
-        return PermissionUtils.canDrawOverlays(getContext());
+        return PermissionUtil.canDrawOverlays(getContext());
     }
 
     private boolean checkWriteExternalStoragePermission() {
-        return PermissionUtils.checkSelfPermission(getActivity(),
+        return PermissionUtil.checkSelfPermission(getActivity(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
-    }
-
-    public boolean isAccessibilityServiceSettingEnabled() {
-        if (getContext() == null)
-            return false;
-        final String service = getContext().getPackageName() + "/" + HongBaoService.class.getCanonicalName();
-        int accessibilityEnabled = Settings.Secure.getInt(getContext().getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, 0);
-        if (accessibilityEnabled != 1)
-            return false;
-        TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
-        String settingValue = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-
-        mStringColonSplitter.setString(settingValue);
-        while (mStringColonSplitter.hasNext()) {
-            String accessibilityService = mStringColonSplitter.next();
-            if (accessibilityService.equalsIgnoreCase(service)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private boolean isAccessibilityServiceWork() {
 //        Log.w(TAG, "isAccessibilityServiceWork: clickTime: " + (new Date().getTime() - RobApplication.timeCheckAccessibilityServiceIsWorking));
 //        return (new Date().getTime() - RobApplication.timeCheckAccessibilityServiceIsWorking) < 5000;
         return HongBaoService.isStart();
-    }
-
-    private boolean isNotificationListenerSettingEnabled() {
-        if (getContext() == null)
-            return false;
-        String notificationEnabled = Settings.Secure.getString(getContext().getContentResolver(), "enabled_notification_listeners");
-        if (TextUtils.isEmpty(notificationEnabled))
-            return false;
-        for (String name : notificationEnabled.split(":")) {
-            ComponentName cn = ComponentName.unflattenFromString(name);
-            if (cn != null) {
-                if (TextUtils.equals(getContext().getPackageName(), cn.getPackageName())) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private boolean isNotificationListenerWork() {
@@ -240,29 +195,6 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
 //
 //        return (new Date().getTime() - RobApplication.timeCheckNotificationListenerServiceIsWorking) < 5000;
         return true;
-    }
-
-    private void sendNotification() {
-        FragmentActivity activity = getActivity();
-        if (activity == null)
-            return;
-        NotificationManager manager = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (manager == null)
-            return;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("1", "1", NotificationManager.IMPORTANCE_DEFAULT);
-            manager.createNotificationChannel(channel);
-        }
-
-        Notification notification = new NotificationCompat.Builder(activity, "1")
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("检测结果")
-                .setContentText("通知通道正常")
-                .setDefaults(Notification.FLAG_ONLY_ALERT_ONCE)
-                .build();
-
-        manager.notify(12, notification);
     }
 
     private void initAbout(ScrollView view) {

@@ -2,6 +2,7 @@ package com.yu.hongbaorob.utils;
 
 import android.Manifest;
 import android.app.AppOpsManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,6 +10,7 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -24,8 +26,8 @@ import java.lang.reflect.Method;
  * desc   : 权限工具
  * version: 1.0
  */
-public class PermissionUtils {
-    private static final String TAG = "PermissionUtils";
+public class PermissionUtil {
+    private static final String TAG = "PermissionUtil";
 
     private static final int OP_WRITE_SETTINGS = 23;
     private static final int OP_SYSTEM_ALERT_WINDOW = 24;
@@ -86,6 +88,58 @@ public class PermissionUtils {
         } else {
             return true;
         }
+    }
+
+    /**
+     * 检测是否具有通知监听权限
+     *
+     * @param context 当前应用的上下文
+     * @return true-具有，false-不具有
+     */
+    public static boolean isNotificationListenerSettingEnabled(Context context) {
+        if (context == null)
+            return false;
+        String notificationEnabled = Settings.Secure.getString(context.getContentResolver(), "enabled_notification_listeners");
+        if (TextUtils.isEmpty(notificationEnabled))
+            return false;
+        for (String name : notificationEnabled.split(":")) {
+            ComponentName cn = ComponentName.unflattenFromString(name);
+            if (cn != null) {
+                if (TextUtils.equals(context.getPackageName(), cn.getPackageName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * 检测是否具有辅助权限
+     *
+     * @param context              当前应用的上下文
+     * @param serviceCanonicalName 服务名称
+     * @return true-具有，false-不具有
+     */
+    public static boolean isAccessibilityServiceSettingEnabled(Context context, String serviceCanonicalName) {
+        if (context == null)
+            return false;
+        final String service = context.getPackageName() + "/" + serviceCanonicalName;
+        int accessibilityEnabled = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, 0);
+        if (accessibilityEnabled != 1)
+            return false;
+        TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
+        String settingValue = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+
+        mStringColonSplitter.setString(settingValue);
+        while (mStringColonSplitter.hasNext()) {
+            String accessibilityService = mStringColonSplitter.next();
+            if (accessibilityService.equalsIgnoreCase(service)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     //######################################## 检查权限 ####################################################################
