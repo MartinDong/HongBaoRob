@@ -3,8 +3,24 @@
     android:accessibilityEventTypes="typeAllMask"
     android:accessibilityFeedbackType="feedbackAllMask"
     android:accessibilityFlags="flagReportViewIds|flagRetrieveInteractiveWindows"
-    android:canRetrieveWindowContent="true"
     android:canPerformGestures="true"
+    android:canRetrieveWindowContent="true"
     android:description="@string/service_label"
     android:notificationTimeout="100"
     android:packageNames="com.tencent.mm,com.android.systemui" />
+
+
+    <!--监视的动作-->
+    <!--android:accessibilityEventTypes="typeAllMask"-->
+    <!--提供反馈类型，语音震动等等。-->
+    <!--android:accessibilityFeedbackType="feedbackGeneric"-->
+    <!--监视的view的状态，注意这里设置 flagDefault 会到时候部分界面状态改变，不触发 onAccessibilityEvent(AccessibilityEvent event)的回调-->
+    <!--android:accessibilityFlags="flagDefault|flagRetrieveInteractiveWindows|flagIncludeNotImportantViews|flagReportViewIds|flagRequestTouchExplorationMode"-->
+    <!--是否要能够检索活动窗口的内容，此设置不能在运行时改变-->
+    <!--android:canRetrieveWindowContent="true"-->
+    <!--功能描述-->
+    <!--android:description="@string/description"-->
+    <!--同一事件间隔时间-->
+    <!--android:notificationTimeout="100"-->
+    <!--监控的软件包名-->
+    <!--android:packageNames="com.tencent.mm,com.eg.android.AlipayGphone"-->

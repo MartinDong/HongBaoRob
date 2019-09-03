@@ -142,6 +142,35 @@ public class PermissionUtil {
         return false;
     }
 
+
+    /**
+     * @param context
+     * @param serviceClass
+     * @return
+     */
+    public static boolean hasServicePermission(Context context, Class serviceClass) {
+        int ok = 0;
+        try {
+            ok = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED);
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        TextUtils.SimpleStringSplitter ms = new TextUtils.SimpleStringSplitter(':');
+        if (ok == 1) {
+            String settingValue = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            if (settingValue != null) {
+                ms.setString(settingValue);
+                while (ms.hasNext()) {
+                    String accessibilityService = ms.next();
+                    if (accessibilityService.contains(serviceClass.getSimpleName())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
     //######################################## 检查权限 ####################################################################
 
 
