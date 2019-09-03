@@ -12,6 +12,11 @@ import android.app.Application;
 public class RobApplication extends Application {
 
     public static RobApplication mApplication;
+    // 用于调整两个RecyclerView高度
+    public static int layoutHeight = -1;
+    // 检查权限按钮的点击时间
+    public static long timeCheckAccessibilityServiceIsWorking = 0;
+    public static long timeCheckNotificationListenerServiceIsWorking = 0;
 
     @Override
     public void onCreate() {

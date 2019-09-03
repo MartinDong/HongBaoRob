@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import com.yu.hongbaorob.service.HongBaoService
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,7 +12,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        tvContent.text = "开启辅助，打开wx聊天界可看到提示，如没有提示请一键清理所有app或重启手机再试"
     }
 
 
