@@ -32,7 +32,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -41,13 +40,13 @@ import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 import com.yu.hongbaorob.R;
 import com.yu.hongbaorob.RobApplication;
 import com.yu.hongbaorob.service.HongBaoService;
+import com.yu.hongbaorob.utils.PermissionUtils;
 import com.yu.hongbaorob.widget.MySwitchCompat;
 
 import java.io.File;
 import java.util.Date;
 
 import br.com.simplepass.loading_button_lib.customViews.CircularProgressButton;
-import ezy.assist.compat.SettingsCompat;
 
 /**
  * @author donghongyu
@@ -99,7 +98,7 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
 
         btnNotificationListener.setOnClickListener(v -> jumpToNotificationListenerSetting());
 
-        btnOverlays.setOnClickListener(v -> SettingsCompat.manageDrawOverlays(getActivity()));
+        btnOverlays.setOnClickListener(v -> PermissionUtils.manageDrawOverlays(getActivity()));
 
         // 检查权限
         CircularProgressButton btnCheckPermission = view.findViewById(R.id.btn_check_permission);
@@ -135,7 +134,7 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
                             "悬浮窗权限",
                             null,
                             checkFloatingPermission(),
-                            v1 -> SettingsCompat.manageDrawOverlays(getActivity())), 1500);
+                            v1 -> PermissionUtils.manageDrawOverlays(getActivity())), 1500);
 
             handler.postDelayed(() ->
                     addView(llPermission,
@@ -176,12 +175,12 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
     }
 
     private boolean checkFloatingPermission() {
-        return SettingsCompat.canDrawOverlays(getContext());
+        return PermissionUtils.canDrawOverlays(getContext());
     }
 
     private boolean checkWriteExternalStoragePermission() {
-        return (ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+        return PermissionUtils.checkSelfPermission(getActivity(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
     public boolean isAccessibilityServiceSettingEnabled() {
