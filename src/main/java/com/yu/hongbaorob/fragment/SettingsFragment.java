@@ -52,6 +52,7 @@ import ezy.assist.compat.SettingsCompat;
 /**
  * @author donghongyu
  * @date 2019-09-02
+ * @desc 设置页面
  */
 public class SettingsFragment extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -110,21 +111,11 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
             llPermission.addView((View) btnCheckPermission.getParent());
 
             boolean accessibilityServiceSettingEnabled = isAccessibilityServiceSettingEnabled();
-//            handler.postDelayed(() -> addView(llPermission, "辅助功能权限授予",
-//                    accessibilityServiceSettingEnabled,
-//                    v1 -> jumpToAccessSetting()), 500);
-//
             boolean notificationListenerSettingEnabled = isNotificationListenerSettingEnabled();
-//            handler.postDelayed(() -> {
-//                addView(llPermission, "通知监听服务开启",
-//                        notificationListenerSettingEnabled,
-//                        v1 -> jumpToNotificationListenerSetting());
-//                if (notificationListenerSettingEnabled)
-//                    sendNotification();
-//            }, 1000);
 
             handler.postDelayed(() -> {
-                addView(llPermission, "辅助功能正常工作",
+                addView(llPermission,
+                        "辅助功能状态",
                         accessibilityServiceSettingEnabled && !isAccessibilityServiceWork() ? " --请尝试重新打开开关" : null,
                         isAccessibilityServiceWork(),
                         v1 -> jumpToAccessSetting());
@@ -132,19 +123,26 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
                     sendNotification();
             }, 500);
 
-            handler.postDelayed(() -> addView(llPermission, "通知监听服务正常工作",
-                    notificationListenerSettingEnabled && !isNotificationListenerWork() ? " --请尝试重新打开开关" : null,
-                    isNotificationListenerWork(),
-                    v1 -> jumpToNotificationListenerSetting()), 1000);
+            handler.postDelayed(() ->
+                    addView(llPermission,
+                            "通知监听服务状态",
+                            notificationListenerSettingEnabled && !isNotificationListenerWork() ? " --请尝试重新打开开关" : null,
+                            isNotificationListenerWork(),
+                            v1 -> jumpToNotificationListenerSetting()), 1000);
 
-            handler.postDelayed(() -> addView(llPermission, "悬浮窗权限", null,
-                    checkFloatingPermission(),
-                    v1 -> SettingsCompat.manageDrawOverlays(getActivity())), 1500);
+            handler.postDelayed(() ->
+                    addView(llPermission,
+                            "悬浮窗权限",
+                            null,
+                            checkFloatingPermission(),
+                            v1 -> SettingsCompat.manageDrawOverlays(getActivity())), 1500);
 
-            handler.postDelayed(() -> addView(llPermission, "外部文件访问权限", null,
-                    checkWriteExternalStoragePermission(),
-                    v1 -> requestWriteExternalStorage()), 2000);
-
+            handler.postDelayed(() ->
+                    addView(llPermission,
+                            "外部文件访问权限",
+                            null,
+                            checkWriteExternalStoragePermission(),
+                            v1 -> requestWriteExternalStorage()), 2000);
             handler.postDelayed(() -> {
                 if (checkFloatingPermission() && checkWriteExternalStoragePermission() && accessibilityServiceSettingEnabled &&
                         isAccessibilityServiceWork() && notificationListenerSettingEnabled && isNotificationListenerWork())
@@ -178,10 +176,7 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
     }
 
     private boolean checkFloatingPermission() {
-//        XToast.build(getContext(),"hello").show();
-//        return Settings.canDrawOverlays(getContext());
         return SettingsCompat.canDrawOverlays(getContext());
-//        return new CheckAuthority(getContext()).checkAlertWindowPermission();
     }
 
     private boolean checkWriteExternalStoragePermission() {
@@ -211,8 +206,9 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
     }
 
     private boolean isAccessibilityServiceWork() {
-        Log.w(TAG, "isAccessibilityServiceWork: clickTime: " + (new Date().getTime() - RobApplication.timeCheckAccessibilityServiceIsWorking));
-        return (new Date().getTime() - RobApplication.timeCheckAccessibilityServiceIsWorking) < 5000;
+//        Log.w(TAG, "isAccessibilityServiceWork: clickTime: " + (new Date().getTime() - RobApplication.timeCheckAccessibilityServiceIsWorking));
+//        return (new Date().getTime() - RobApplication.timeCheckAccessibilityServiceIsWorking) < 5000;
+        return HongBaoService.isStart();
     }
 
     private boolean isNotificationListenerSettingEnabled() {
@@ -233,17 +229,18 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
     }
 
     private boolean isNotificationListenerWork() {
-        Log.d(TAG, "isNotificationListenerWork: clickTime: " + (new Date().getTime() - RobApplication.timeCheckNotificationListenerServiceIsWorking));
-
-        FragmentActivity activity = getActivity();
-        if (activity == null)
-            return false;
-        NotificationManager manager = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (manager == null)
-            return false;
-        manager.cancel(12);
-
-        return (new Date().getTime() - RobApplication.timeCheckNotificationListenerServiceIsWorking) < 5000;
+//        Log.d(TAG, "isNotificationListenerWork: clickTime: " + (new Date().getTime() - RobApplication.timeCheckNotificationListenerServiceIsWorking));
+//
+//        FragmentActivity activity = getActivity();
+//        if (activity == null)
+//            return false;
+//        NotificationManager manager = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
+//        if (manager == null)
+//            return false;
+//        manager.cancel(12);
+//
+//        return (new Date().getTime() - RobApplication.timeCheckNotificationListenerServiceIsWorking) < 5000;
+        return true;
     }
 
     private void sendNotification() {
@@ -261,8 +258,8 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
 
         Notification notification = new NotificationCompat.Builder(activity, "1")
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("title")
-                .setContentText("test")
+                .setContentTitle("检测结果")
+                .setContentText("通知通道正常")
                 .setDefaults(Notification.FLAG_ONLY_ALERT_ONCE)
                 .build();
 
@@ -288,8 +285,8 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
 
     }
 
+    // TODO: 2018/7/2 查看日志
     private void initLogViewer(ScrollView view) {
-        // TODO: 2018/7/2 查看日志
         view.findViewById(R.id.copyright).setOnClickListener(v -> {
             long clickTime = new Date().getTime();
             if (clickTime - this.clickTime > 1000)

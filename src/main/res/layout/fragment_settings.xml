@@ -24,7 +24,8 @@
             android:dividerPadding="@dimen/margin_16"
             android:orientation="vertical"
             android:showDividers="middle"
-            android:theme="@style/SettingsTheme">
+            android:theme="@style/SettingsTheme"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="match_parent"
@@ -69,7 +70,6 @@
             android:background="@android:color/white"
             android:orientation="vertical"
             android:theme="@style/SettingsTheme">
-
 
             <LinearLayout
                 android:id="@+id/ll_permission"
