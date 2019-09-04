@@ -4,12 +4,13 @@
     android:id="@+id/fragment_settings"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:fillViewport="true"
     tools:context="com.yu.hongbaorob.fragment.SettingsFragment"
     tools:ignore="HardcodedText">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="@color/gray_light"
         android:orientation="vertical"
         android:paddingTop="20dp"

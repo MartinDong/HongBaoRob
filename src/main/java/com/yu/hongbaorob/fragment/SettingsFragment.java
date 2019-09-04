@@ -1,16 +1,11 @@
 package com.yu.hongbaorob.fragment;
 
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.StrictMode;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +18,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
@@ -34,7 +28,6 @@ import com.yu.hongbaorob.utils.NotificationUtil;
 import com.yu.hongbaorob.utils.PermissionUtil;
 import com.yu.hongbaorob.widget.MySwitchCompat;
 
-import java.io.File;
 import java.util.Date;
 
 import br.com.simplepass.loading_button_lib.customViews.CircularProgressButton;
@@ -48,8 +41,6 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
 
     private String TAG = "SettingsFragment";
     private Handler handler = new Handler();
-    private long clickTime = new Date().getTime();
-    private int clicks = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -168,54 +159,7 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
             e.printStackTrace();
         }
 
-        initLogViewer(view);
 
-    }
-
-    // TODO: 2018/7/2 查看日志
-    private void initLogViewer(ScrollView view) {
-        view.findViewById(R.id.copyright).setOnClickListener(v -> {
-            long clickTime = new Date().getTime();
-            if (clickTime - this.clickTime > 1000)
-                clicks = 1;
-            else
-                clicks++;
-            this.clickTime = clickTime;
-            if (clicks == 5) {
-                File file = new File(getActivity().getExternalFilesDir("logs"), "Anti-recall-06-14.log");
-                Log.i(TAG, "onCreateView: file: " + file);
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    Uri uri = FileProvider.getUriForFile(getActivity(), "com.qsboy.provider", file.getParentFile());
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    intent.setDataAndType(uri, "*/*");
-                } else {
-                    intent.setDataAndType(Uri.fromFile(file), "*/*");
-                }
-                startActivity(intent);
-            }
-//            public static void shareFile(Context context, Uri uri) {
-            // File file = new File("\sdcard\android123.cwj"); //附件文件地址
-            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-            StrictMode.setVmPolicy(builder.build());
-            builder.detectFileUriExposure();
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.putExtra("subject", ""); //
-            intent.putExtra("body", ""); // 正文
-//                intent.putExtra(Intent.EXTRA_STREAM, uri); // 添加附件，附件为file对象
-//                if (uri.toString().endsWith(".gz")) {
-//                    intent.setType("application/x-gzip"); // 如果是gz使用gzip的mime
-//                } else if (uri.toString().endsWith(".txt")) {
-//                    intent.setType("text/plain"); // 纯文本则用text/plain的mime
-//                } else {
-            intent.setType("application/octet-stream"); // 其他的均使用流当做二进制数据来发送
-//                }
-            startActivity(intent); // 调用系统的mail客户端进行发送
-//            }
-        });
     }
 
     @Override
