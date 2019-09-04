@@ -56,18 +56,48 @@ public class HongBaoService extends AccessibilityService {
             AccessibilityNodeInfo rootNode = getRootInActiveWindow();
             if (null == rootNode) return;
 
-            List<AccessibilityNodeInfo> list = rootNode.findAccessibilityNodeInfosByText(getString(R.string.get_lucky));
-            if (null == list || list.size() == 0) return;
-
-            AccessibilityNodeInfo parent = list.get(list.size() - 1);
-            while (null != parent) {
-                if (parent.isClickable() && !luckyClicked) {
-                    parent.performAction(ACTION_CLICK);
-                    luckyClicked = true;
-                    break;
+            // 查找页面中的，微信红包，触发点击事件，唤起红包详情
+            List<AccessibilityNodeInfo> listHongBao = rootNode.findAccessibilityNodeInfosByText(getString(R.string.get_lucky));
+            if (null != listHongBao && listHongBao.size() > 0) {
+                AccessibilityNodeInfo parent = listHongBao.get(listHongBao.size() - 1);
+                while (null != parent) {
+                    if (parent.isClickable() && !luckyClicked) {
+                        parent.performAction(ACTION_CLICK);
+                        luckyClicked = true;
+                        break;
+                    }
+                    parent = parent.getParent();
                 }
-                parent = parent.getParent();
             }
+
+            // 查找页面中的id=d4h，触发点击抢红包
+            List<AccessibilityNodeInfo> listHongBaoDetial = rootNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/d4h");
+            if (null != listHongBaoDetial && listHongBaoDetial.size() > 0) {
+                AccessibilityNodeInfo parent = listHongBaoDetial.get(listHongBaoDetial.size() - 1);
+                while (null != parent) {
+                    if (parent.isClickable() && !luckyClicked) {
+                        parent.performAction(ACTION_CLICK);
+                        luckyClicked = true;
+                        break;
+                    }
+                    parent = parent.getParent();
+                }
+            }
+
+            // 查找页面中的id=com.tencent.mm:id/lb，触发返回
+            List<AccessibilityNodeInfo> listBack = rootNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/lb");
+            if (null != listBack && listBack.size() > 0) {
+                AccessibilityNodeInfo parent = listBack.get(listBack.size() - 1);
+                while (null != parent) {
+                    if (parent.isClickable() && !luckyClicked) {
+                        parent.performAction(ACTION_CLICK);
+                        luckyClicked = true;
+                        break;
+                    }
+                    parent = parent.getParent();
+                }
+            }
+
         }
 
         if (eventType == TYPE_WINDOW_STATE_CHANGED) {

@@ -39,7 +39,7 @@ public class NotificationService extends NotificationListenerService {
 
         if (textList.size() == 0) return;
         for (String text : textList) {
-            if (!isEmpty(text) && text.contains("[微信红包]")) {
+            if (!isEmpty(text) && text.contains("微信红包")) {
                 Log.e(TAG,"---红包来啦🧧---");
                 final PendingIntent pendingIntent = notification.contentIntent;
                 try {

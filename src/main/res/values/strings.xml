@@ -4,6 +4,6 @@
     <string name="service_label">本功能开启后会监听通知栏消息，当前打开的聊天页面</string>
 
 
-    <string name="get_lucky">领取红包</string>
+    <string name="get_lucky">微信红包</string>
 
 </resources>

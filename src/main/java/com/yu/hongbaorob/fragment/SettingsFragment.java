@@ -22,11 +22,9 @@ import androidx.fragment.app.Fragment;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import com.yu.hongbaorob.R;
-import com.yu.hongbaorob.RobApplication;
 import com.yu.hongbaorob.service.HongBaoService;
 import com.yu.hongbaorob.utils.NotificationUtil;
 import com.yu.hongbaorob.utils.PermissionUtil;
-import com.yu.hongbaorob.widget.MySwitchCompat;
 
 import br.com.simplepass.loading_button_lib.customViews.CircularProgressButton;
 
@@ -48,24 +46,9 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
 
         initPermissionCheck(view);
 
-        initSettings(view);
-
         initAbout(view);
 
         return view;
-    }
-
-    private void initSettings(ScrollView view) {
-        // 设置
-        ((MySwitchCompat) view.findViewById(R.id.switch_show_all_qq_messages))
-                .setAttr(RobApplication.class, "isShowAllQQMessages")
-                .setOnCheckedChangeListener((compoundButton, b) -> RobApplication.layoutHeight = -1);
-        ((MySwitchCompat) view.findViewById(R.id.switch_we_chat_auto_login))
-                .setAttr(RobApplication.class, "isWeChatAutoLogin");
-        ((MySwitchCompat) view.findViewById(R.id.switch_swipe_remove_on))
-                .setAttr(RobApplication.class, "isSwipeRemoveOn");
-        ((MySwitchCompat) view.findViewById(R.id.switch_check_update_only_on_wifi))
-                .setAttr(RobApplication.class, "isCheckUpdateOnlyOnWiFi");
     }
 
     private void initPermissionCheck(ScrollView view) {

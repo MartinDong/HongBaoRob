@@ -22,53 +22,6 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:background="@android:color/white"
-            android:dividerPadding="@dimen/margin_16"
-            android:orientation="vertical"
-            android:showDividers="middle"
-            android:theme="@style/SettingsTheme"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="设置"
-                android:textColor="@color/colorAccent"
-                android:textStyle="bold" />
-
-            <com.yu.hongbaorob.widget.MySwitchCompat
-                android:id="@+id/switch_we_chat_auto_login"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:padding="@dimen/margin_16"
-                android:text="微信自动登录"
-                android:textColor="@color/text_color_message" />
-
-            <com.yu.hongbaorob.widget.MySwitchCompat
-                android:id="@+id/switch_show_all_qq_messages"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:padding="@dimen/margin_16"
-                android:text="显示所有QQ内容"
-                android:textColor="@color/text_color_message" />
-
-            <com.yu.hongbaorob.widget.MySwitchCompat
-                android:id="@+id/switch_swipe_remove_on"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:padding="@dimen/margin_16"
-                android:text="打开侧滑删除"
-                android:textColor="@color/text_color_message" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:background="@android:color/white"
             android:orientation="vertical"
             android:theme="@style/SettingsTheme">
 
