@@ -56,28 +56,26 @@ public class HongBaoService extends AccessibilityService {
             AccessibilityNodeInfo rootNode = getRootInActiveWindow();
             if (null == rootNode) return;
 
-            // 查找页面中的，微信红包，触发点击事件，唤起红包详情
-            List<AccessibilityNodeInfo> listHongBao = rootNode.findAccessibilityNodeInfosByText(getString(R.string.get_lucky));
+            // 查找页面中的 id=com.tencent.mm:id/as8 ，微信红包，触发点击事件，唤起红包详情
+            List<AccessibilityNodeInfo> listHongBao = rootNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/as8");
             if (null != listHongBao && listHongBao.size() > 0) {
                 AccessibilityNodeInfo parent = listHongBao.get(listHongBao.size() - 1);
                 while (null != parent) {
-                    if (parent.isClickable() && !luckyClicked) {
+                    if (parent.isClickable()) {
                         parent.performAction(ACTION_CLICK);
-                        luckyClicked = true;
                         break;
                     }
                     parent = parent.getParent();
                 }
             }
 
-            // 查找页面中的id=d4h，触发点击抢红包
+            // 查找页面中的 id=com.tencent.mm:id/d4h ，触发点击抢红包
             List<AccessibilityNodeInfo> listHongBaoDetial = rootNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/d4h");
             if (null != listHongBaoDetial && listHongBaoDetial.size() > 0) {
                 AccessibilityNodeInfo parent = listHongBaoDetial.get(listHongBaoDetial.size() - 1);
                 while (null != parent) {
-                    if (parent.isClickable() && !luckyClicked) {
+                    if (parent.isClickable() ) {
                         parent.performAction(ACTION_CLICK);
-                        luckyClicked = true;
                         break;
                     }
                     parent = parent.getParent();
@@ -89,9 +87,8 @@ public class HongBaoService extends AccessibilityService {
             if (null != listBack && listBack.size() > 0) {
                 AccessibilityNodeInfo parent = listBack.get(listBack.size() - 1);
                 while (null != parent) {
-                    if (parent.isClickable() && !luckyClicked) {
+                    if (parent.isClickable()) {
                         parent.performAction(ACTION_CLICK);
-                        luckyClicked = true;
                         break;
                     }
                     parent = parent.getParent();
