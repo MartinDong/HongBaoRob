@@ -65,6 +65,11 @@ public class HongBaoService extends AccessibilityService {
                         continue;
                     }
 
+                    List<AccessibilityNodeInfo> status3 = accessibilityNodeInfo.findAccessibilityNodeInfosByText("微信红包");
+                    if (null == status3 || status3.size() == 0) {
+                        continue;
+                    }
+
                     // 执行点击事件
                     while (null != accessibilityNodeInfo) {
                         if (accessibilityNodeInfo.isClickable()) {
@@ -81,7 +86,7 @@ public class HongBaoService extends AccessibilityService {
             if (null != listHongBaoDetial && listHongBaoDetial.size() > 0) {
                 AccessibilityNodeInfo parentHongBaoDetial = listHongBaoDetial.get(listHongBaoDetial.size() - 1);
                 while (null != parentHongBaoDetial) {
-                    if (parentHongBaoDetial.isClickable() && luckyClicked) {
+                    if (parentHongBaoDetial.isClickable()) {
                         parentHongBaoDetial.performAction(ACTION_CLICK);
                         luckyClicked = true;
                         break;
