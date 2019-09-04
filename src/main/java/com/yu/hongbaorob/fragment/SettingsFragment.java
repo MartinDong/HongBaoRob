@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -87,11 +86,11 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
         View btnNotificationListener = view.findViewById(R.id.btn_navigate_notification_listener);
         View btnOverlays = view.findViewById(R.id.btn_navigate_overlays);
 
-        btnAccessibilityService.setOnClickListener(v -> jumpToAccessSetting());
+        btnAccessibilityService.setOnClickListener(v -> PermissionUtil.manageAccessSetting(getContext()));
 
-        btnNotificationListener.setOnClickListener(v -> jumpToNotificationListenerSetting());
+        btnNotificationListener.setOnClickListener(v -> PermissionUtil.manageNotificationListenerSetting(getContext()));
 
-        btnOverlays.setOnClickListener(v -> PermissionUtil.manageDrawOverlays(getActivity()));
+        btnOverlays.setOnClickListener(v -> PermissionUtil.manageDrawOverlays(getContext()));
 
         // 检查权限
         CircularProgressButton btnCheckPermission = view.findViewById(R.id.btn_check_permission);
@@ -102,15 +101,17 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
             llPermission.removeAllViews();
             llPermission.addView((View) btnCheckPermission.getParent());
 
-            boolean accessibilityServiceSettingEnabled = PermissionUtil.isAccessibilityServiceSettingEnabled(getContext(), HongBaoService.class.getCanonicalName());
-            boolean notificationListenerSettingEnabled = PermissionUtil.isNotificationListenerSettingEnabled(getContext());
+            boolean accessibilityServiceSettingEnabled =
+                    PermissionUtil.isAccessibilityServiceSettingEnabled(getContext(), HongBaoService.class.getCanonicalName());
+            boolean notificationListenerSettingEnabled =
+                    PermissionUtil.isNotificationListenerSettingEnabled(getContext());
 
             handler.postDelayed(() -> {
                 addView(llPermission,
                         "辅助功能状态",
                         accessibilityServiceSettingEnabled && !isAccessibilityServiceWork() ? " --请尝试重新打开开关" : null,
                         isAccessibilityServiceWork(),
-                        v1 -> jumpToAccessSetting());
+                        v1 -> PermissionUtil.manageAccessSetting(getContext()));
                 if (notificationListenerSettingEnabled)
                     NotificationUtil.sendNotification(getActivity(), "检测结果", "通知通道正常");
             }, 500);
@@ -120,23 +121,26 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
                             "通知监听服务状态",
                             notificationListenerSettingEnabled && !isNotificationListenerWork() ? " --请尝试重新打开开关" : null,
                             isNotificationListenerWork(),
-                            v1 -> jumpToNotificationListenerSetting()), 1000);
+                            v1 -> PermissionUtil.manageNotificationListenerSetting(getActivity())), 1000);
 
             handler.postDelayed(() ->
                     addView(llPermission,
                             "悬浮窗权限",
                             null,
-                            checkFloatingPermission(),
-                            v1 -> PermissionUtil.manageDrawOverlays(getActivity())), 1500);
+                            PermissionUtil.canDrawOverlays(getContext()),
+                            v1 -> PermissionUtil.manageDrawOverlays(getContext())), 1500);
 
             handler.postDelayed(() ->
                     addView(llPermission,
                             "外部文件访问权限",
                             null,
-                            checkWriteExternalStoragePermission(),
-                            v1 -> requestWriteExternalStorage()), 2000);
+                            PermissionUtil.canWrite(getContext()),
+                            v1 -> PermissionUtil.requestWriteExternalStorage(getActivity())), 2000);
+
             handler.postDelayed(() -> {
-                if (checkFloatingPermission() && checkWriteExternalStoragePermission() && accessibilityServiceSettingEnabled &&
+                if (PermissionUtil.canDrawOverlays(getContext()) &&
+                        PermissionUtil.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) &&
+                        accessibilityServiceSettingEnabled &&
                         isAccessibilityServiceWork() && notificationListenerSettingEnabled && isNotificationListenerWork())
                     btnCheckPermission.doneLoadingAnimation(
                             getResources().getColor(R.color.colorCorrect),
@@ -148,32 +152,6 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
 
             handler.postDelayed(btnCheckPermission::revertAnimation, 5000);
         });
-    }
-
-    private void jumpToNotificationListenerSetting() {
-        Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
-
-    private void jumpToAccessSetting() {
-        Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
-
-    private void requestWriteExternalStorage() {
-        ActivityCompat.requestPermissions(getActivity(),
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
-    }
-
-    private boolean checkFloatingPermission() {
-        return PermissionUtil.canDrawOverlays(getContext());
-    }
-
-    private boolean checkWriteExternalStoragePermission() {
-        return PermissionUtil.checkSelfPermission(getActivity(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
     private boolean isAccessibilityServiceWork() {

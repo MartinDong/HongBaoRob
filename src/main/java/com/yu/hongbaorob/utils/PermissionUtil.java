@@ -1,6 +1,7 @@
 package com.yu.hongbaorob.utils;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AppOpsManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -14,6 +15,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.PermissionChecker;
 
 import java.lang.reflect.Method;
@@ -81,13 +83,8 @@ public class PermissionUtil {
      * @return true-具有，false-不具有
      */
     public static boolean canWrite(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return Settings.System.canWrite(context);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            return checkOp(context, OP_WRITE_SETTINGS);
-        } else {
-            return true;
-        }
+        return checkSelfPermission(context,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
     /**
@@ -203,16 +200,37 @@ public class PermissionUtil {
     }
 
     /**
-     * 管理写入权限
+     * 管理通知监听服务
      *
      * @param context 当前应用的上下文
      */
-    public static void manageWriteSettings(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-            intent.setData(Uri.parse("package:" + context.getPackageName()));
+    public static void manageNotificationListenerSetting(Context context) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
+            Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         }
+    }
+
+    /**
+     * 管理辅助功能权限
+     *
+     * @param context 当前应用的上下文
+     */
+    public static void manageAccessSetting(Context context) {
+        Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
+    /**
+     * 管理写入权限
+     *
+     * @param activity 当前应用的上下文
+     */
+    public static void requestWriteExternalStorage(Activity activity) {
+        ActivityCompat.requestPermissions(activity,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
     }
 
     /**
