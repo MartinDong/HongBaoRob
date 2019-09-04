@@ -204,7 +204,7 @@ public class PermissionUtil {
      *
      * @param context 当前应用的上下文
      */
-    public static void manageNotificationListenerSetting(Context context) {
+    public static void requestNotificationListenerSetting(Context context) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
             Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -217,7 +217,7 @@ public class PermissionUtil {
      *
      * @param context 当前应用的上下文
      */
-    public static void manageAccessSetting(Context context) {
+    public static void requestAccessSetting(Context context) {
         Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
@@ -238,8 +238,8 @@ public class PermissionUtil {
      *
      * @param context 当前应用的上下文
      */
-    public static void manageDrawOverlays(Context context) {
-        if (manageDrawOverlaysForRom(context)) {
+    public static void requestDrawOverlays(Context context) {
+        if (requestDrawOverlaysForRom(context)) {
             return;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -255,7 +255,7 @@ public class PermissionUtil {
      *
      * @param context 当前应用的上下文
      */
-    private static boolean manageDrawOverlaysForRom(Context context) {
+    private static boolean requestDrawOverlaysForRom(Context context) {
         if (RomUtil.isMiui()) {
             return manageDrawOverlaysForMiui(context);
         }

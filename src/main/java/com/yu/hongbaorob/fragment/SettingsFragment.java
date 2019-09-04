@@ -1,6 +1,5 @@
 package com.yu.hongbaorob.fragment;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -86,11 +85,11 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
         View btnNotificationListener = view.findViewById(R.id.btn_navigate_notification_listener);
         View btnOverlays = view.findViewById(R.id.btn_navigate_overlays);
 
-        btnAccessibilityService.setOnClickListener(v -> PermissionUtil.manageAccessSetting(getContext()));
+        btnAccessibilityService.setOnClickListener(v -> PermissionUtil.requestAccessSetting(getContext()));
 
-        btnNotificationListener.setOnClickListener(v -> PermissionUtil.manageNotificationListenerSetting(getContext()));
+        btnNotificationListener.setOnClickListener(v -> PermissionUtil.requestNotificationListenerSetting(getContext()));
 
-        btnOverlays.setOnClickListener(v -> PermissionUtil.manageDrawOverlays(getContext()));
+        btnOverlays.setOnClickListener(v -> PermissionUtil.requestDrawOverlays(getContext()));
 
         // 检查权限
         CircularProgressButton btnCheckPermission = view.findViewById(R.id.btn_check_permission);
@@ -109,9 +108,9 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
             handler.postDelayed(() -> {
                 addView(llPermission,
                         "辅助功能状态",
-                        accessibilityServiceSettingEnabled && !isAccessibilityServiceWork() ? " --请尝试重新打开开关" : null,
-                        isAccessibilityServiceWork(),
-                        v1 -> PermissionUtil.manageAccessSetting(getContext()));
+                        accessibilityServiceSettingEnabled ? null : " --请尝试重新打开开关",
+                        accessibilityServiceSettingEnabled,
+                        v1 -> PermissionUtil.requestAccessSetting(getContext()));
                 if (notificationListenerSettingEnabled)
                     NotificationUtil.sendNotification(getActivity(), "检测结果", "通知通道正常");
             }, 500);
@@ -119,16 +118,16 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
             handler.postDelayed(() ->
                     addView(llPermission,
                             "通知监听服务状态",
-                            notificationListenerSettingEnabled && !isNotificationListenerWork() ? " --请尝试重新打开开关" : null,
-                            isNotificationListenerWork(),
-                            v1 -> PermissionUtil.manageNotificationListenerSetting(getActivity())), 1000);
+                            notificationListenerSettingEnabled ? null : " --请尝试重新打开开关",
+                            notificationListenerSettingEnabled,
+                            v1 -> PermissionUtil.requestNotificationListenerSetting(getActivity())), 1000);
 
             handler.postDelayed(() ->
                     addView(llPermission,
                             "悬浮窗权限",
                             null,
                             PermissionUtil.canDrawOverlays(getContext()),
-                            v1 -> PermissionUtil.manageDrawOverlays(getContext())), 1500);
+                            v1 -> PermissionUtil.requestDrawOverlays(getContext())), 1500);
 
             handler.postDelayed(() ->
                     addView(llPermission,
@@ -139,9 +138,9 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
 
             handler.postDelayed(() -> {
                 if (PermissionUtil.canDrawOverlays(getContext()) &&
-                        PermissionUtil.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) &&
+                        PermissionUtil.canWrite(getContext()) &&
                         accessibilityServiceSettingEnabled &&
-                        isAccessibilityServiceWork() && notificationListenerSettingEnabled && isNotificationListenerWork())
+                        notificationListenerSettingEnabled)
                     btnCheckPermission.doneLoadingAnimation(
                             getResources().getColor(R.color.colorCorrect),
                             getBitmap(R.drawable.ic_accept));
@@ -152,27 +151,6 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
 
             handler.postDelayed(btnCheckPermission::revertAnimation, 5000);
         });
-    }
-
-    private boolean isAccessibilityServiceWork() {
-//        Log.w(TAG, "isAccessibilityServiceWork: clickTime: " + (new Date().getTime() - RobApplication.timeCheckAccessibilityServiceIsWorking));
-//        return (new Date().getTime() - RobApplication.timeCheckAccessibilityServiceIsWorking) < 5000;
-        return HongBaoService.isStart();
-    }
-
-    private boolean isNotificationListenerWork() {
-//        Log.d(TAG, "isNotificationListenerWork: clickTime: " + (new Date().getTime() - RobApplication.timeCheckNotificationListenerServiceIsWorking));
-//
-//        FragmentActivity activity = getActivity();
-//        if (activity == null)
-//            return false;
-//        NotificationManager manager = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
-//        if (manager == null)
-//            return false;
-//        manager.cancel(12);
-//
-//        return (new Date().getTime() - RobApplication.timeCheckNotificationListenerServiceIsWorking) < 5000;
-        return true;
     }
 
     private void initAbout(ScrollView view) {
