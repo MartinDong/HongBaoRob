@@ -28,8 +28,6 @@ import com.yu.hongbaorob.utils.NotificationUtil;
 import com.yu.hongbaorob.utils.PermissionUtil;
 import com.yu.hongbaorob.widget.MySwitchCompat;
 
-import java.util.Date;
-
 import br.com.simplepass.loading_button_lib.customViews.CircularProgressButton;
 
 /**
@@ -158,8 +156,6 @@ public class SettingsFragment extends Fragment implements ActivityCompat.OnReque
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-
-
     }
 
     @Override

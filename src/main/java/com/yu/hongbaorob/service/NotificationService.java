@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class NotificationService extends NotificationListenerService {
         if (textList.size() == 0) return;
         for (String text : textList) {
             if (!isEmpty(text) && text.contains("[微信红包]")) {
+                Log.e(TAG,"---红包来啦🧧---");
                 final PendingIntent pendingIntent = notification.contentIntent;
                 try {
                     pendingIntent.send();
