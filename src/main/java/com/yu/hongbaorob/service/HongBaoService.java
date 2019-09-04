@@ -65,6 +65,7 @@ public class HongBaoService extends AccessibilityService {
                         continue;
                     }
 
+                    // 判断是否是微信红包
                     List<AccessibilityNodeInfo> status3 = accessibilityNodeInfo.findAccessibilityNodeInfosByText("微信红包");
                     if (null == status3 || status3.size() == 0) {
                         continue;
