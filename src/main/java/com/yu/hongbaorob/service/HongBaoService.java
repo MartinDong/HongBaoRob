@@ -9,8 +9,6 @@ import android.os.PowerManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.yu.hongbaorob.R;
-
 import java.util.List;
 
 import static android.view.accessibility.AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED;
@@ -56,42 +54,53 @@ public class HongBaoService extends AccessibilityService {
             AccessibilityNodeInfo rootNode = getRootInActiveWindow();
             if (null == rootNode) return;
 
-            // 查找页面中的 id=com.tencent.mm:id/as8 ，微信红包，触发点击事件，唤起红包详情
-            List<AccessibilityNodeInfo> listHongBao = rootNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/as8");
+            // 查找页面中的 id=com.tencent.mm:id/ar0 ，微信红包，触发点击事件，唤起红包详情
+            List<AccessibilityNodeInfo> listHongBao = rootNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/ar0");
             if (null != listHongBao && listHongBao.size() > 0) {
-                AccessibilityNodeInfo parent = listHongBao.get(listHongBao.size() - 1);
-                while (null != parent) {
-                    if (parent.isClickable()) {
-                        parent.performAction(ACTION_CLICK);
-                        break;
+                for (AccessibilityNodeInfo accessibilityNodeInfo : listHongBao) {
+                    // 判断红包是否已经被领取了
+                    List<AccessibilityNodeInfo> status = accessibilityNodeInfo.findAccessibilityNodeInfosByText("已领取");
+                    List<AccessibilityNodeInfo> status2 = accessibilityNodeInfo.findAccessibilityNodeInfosByText("已被领完");
+                    if (null == status || status.size() > 0 || null == status2 || status2.size() > 0) {
+                        continue;
                     }
-                    parent = parent.getParent();
+
+                    // 执行点击事件
+                    while (null != accessibilityNodeInfo) {
+                        if (accessibilityNodeInfo.isClickable()) {
+                            accessibilityNodeInfo.performAction(ACTION_CLICK);
+                            break;
+                        }
+                        accessibilityNodeInfo = accessibilityNodeInfo.getParent();
+                    }
                 }
             }
 
             // 查找页面中的 id=com.tencent.mm:id/d4h ，触发点击抢红包
             List<AccessibilityNodeInfo> listHongBaoDetial = rootNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/d4h");
             if (null != listHongBaoDetial && listHongBaoDetial.size() > 0) {
-                AccessibilityNodeInfo parent = listHongBaoDetial.get(listHongBaoDetial.size() - 1);
-                while (null != parent) {
-                    if (parent.isClickable() ) {
-                        parent.performAction(ACTION_CLICK);
+                AccessibilityNodeInfo parentHongBaoDetial = listHongBaoDetial.get(listHongBaoDetial.size() - 1);
+                while (null != parentHongBaoDetial) {
+                    if (parentHongBaoDetial.isClickable() && luckyClicked) {
+                        parentHongBaoDetial.performAction(ACTION_CLICK);
+                        luckyClicked = true;
                         break;
                     }
-                    parent = parent.getParent();
+                    parentHongBaoDetial = parentHongBaoDetial.getParent();
                 }
             }
 
             // 查找页面中的id=com.tencent.mm:id/lb，触发返回
             List<AccessibilityNodeInfo> listBack = rootNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/lb");
             if (null != listBack && listBack.size() > 0) {
-                AccessibilityNodeInfo parent = listBack.get(listBack.size() - 1);
-                while (null != parent) {
-                    if (parent.isClickable()) {
-                        parent.performAction(ACTION_CLICK);
+                AccessibilityNodeInfo parentlistBack = listBack.get(listBack.size() - 1);
+                while (null != parentlistBack) {
+                    if (parentlistBack.isClickable() && luckyClicked) {
+                        parentlistBack.performAction(ACTION_CLICK);
+                        luckyClicked = false;
                         break;
                     }
-                    parent = parent.getParent();
+                    parentlistBack = parentlistBack.getParent();
                 }
             }
 
